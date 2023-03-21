@@ -3,7 +3,6 @@ import { Db } from "./core/db";
 import { Framework } from "./core/framework";
 import { TestRunner } from "./utils/test-runner";
 import { DataStorage } from "./utils/data-storage";
-import exec from "child_process";
 import { CreateCustomerWithAddress } from "./tests/create/create-customer-with-address";
 import { CreateOrder } from "./tests/create/create-order";
 import { CreateProduct } from "./tests/create/create-product";
@@ -87,7 +86,6 @@ import { CreateCustomerBulk } from "./tests/create/create-customer-bulk";
         const sorted = Object.values(testRegistry).sort((a, b) => a.dbSize - b.dbSize);
         DataStorage.instance.add(sorted);
 
-        await dockerManager.composeDown();
         await dockerManager.composeUp();
 
         const testRunner = new TestRunner();

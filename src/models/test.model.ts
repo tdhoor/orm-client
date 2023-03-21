@@ -2,7 +2,7 @@ import { DbSize } from "../core/db-size";
 import { IExec } from "./exec.model";
 import { Db } from "../core/db";
 import { Framework } from "../core/framework";
-import { CSV_SEPARATOR, DATA_DIR, FILE_SEPPARATOR, RESULT_DIR } from "../core/global.const";
+import { CSV_SEPARATOR, DATA_DIR, RESULT_DIR } from "../core/global.const";
 import { TestResultResponse } from "@core/models/test-result-response.model";
 import { DbSeeder } from "src/utils/db-seeder";
 
