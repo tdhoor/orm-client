@@ -22,8 +22,6 @@ export class ReadCustomerOrders extends Test<IOrder> {
         const data: number[] = DataStorage.instance.get(this);
 
         for (const entry of data) {
-            // console.log("exec: " + this.name + " i: " + this.results.length);
-
             const response = await ApiHttpClient.instance.get(this.endpoint.replace(":id", entry + ""));
             if (response) {
                 this.results.push(response)
@@ -33,7 +31,7 @@ export class ReadCustomerOrders extends Test<IOrder> {
     }
 
     createData(): any {
-        return createTestData.read.customerIds(AMOUNT_OF_TEST_EXECUTIONS, this.dbSize);
+        return createTestData.read.orderIds(AMOUNT_OF_TEST_EXECUTIONS, this.dbSize);
     }
 }
 

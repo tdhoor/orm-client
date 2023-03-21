@@ -24,8 +24,6 @@ export class CreateProduct extends Test<IProduct> {
         const data = DataStorage.instance.get(this);
 
         for (const entry of data) {
-            // console.log("exec: " + this.name + " i: " + this.results.length);
-
             const response = await ApiHttpClient.instance.post(this.endpoint, entry);
             if (response) {
                 this.results.push(response)

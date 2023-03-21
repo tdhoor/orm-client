@@ -22,8 +22,6 @@ export class DeleteOrder extends Test<ICustomer> {
         const data: number[] = DataStorage.instance.get(this);
 
         for (const id of data) {
-            // console.log("exec: " + this.name + " i: " + this.results.length);
-
             const response = await ApiHttpClient.instance.delete(`${this.endpoint}/${id}`);
             if (response) {
                 this.results.push(response)
