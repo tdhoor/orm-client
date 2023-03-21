@@ -20,7 +20,8 @@ import { DockerStrategy } from "./models/docker-strategy.model";
 import { DockerTypeOrmPostgres } from "./models/docker-type-orm-postgres.model";
 import { DockerPrismaPostgres } from "./models/docker-prisma-postgres.model";
 import { DockerSequelizePostgres } from "./models/docker-sequelize-postgres.model";
-
+import { ReadProduct } from "./tests/read/read-product";
+import { CreateCustomerBulk } from "./tests/create/create-customer-bulk";
 
 (async () => {
     const dockerManager = new DockerService();
@@ -34,6 +35,10 @@ import { DockerSequelizePostgres } from "./models/docker-sequelize-postgres.mode
         let configLarge = { db: currDb, framework: currFramework, dbSize: DbSize.large };
 
         const testRegistry = {
+            createCustomerBulkSmall: new CreateCustomerBulk(configSmall),
+            createCustomerBulkMedium: new CreateCustomerBulk(configMedium),
+            createCustomerBulkLarge: new CreateCustomerBulk(configLarge),
+
             createProductSmall: new CreateProduct(configSmall),
             createProductMedium: new CreateProduct(configMedium),
             createProductLarge: new CreateProduct(configLarge),
@@ -45,6 +50,10 @@ import { DockerSequelizePostgres } from "./models/docker-sequelize-postgres.mode
             createOrderSmall: new CreateOrder(configSmall),
             createOrderMedium: new CreateOrder(configMedium),
             createOrderLarge: new CreateOrder(configLarge),
+
+            readProductsSmall: new ReadProduct(configSmall),
+            readProductsMedium: new ReadProduct(configMedium),
+            readProductsLarge: new ReadProduct(configLarge),
 
             readCustomerOrdersSmall: new ReadCustomerOrders(configSmall),
             readCustomerOrdersMedium: new ReadCustomerOrders(configMedium),
@@ -90,7 +99,7 @@ import { DockerSequelizePostgres } from "./models/docker-sequelize-postgres.mode
 
     await fn(DockerTypeOrmPostgres, Db.postgres, Framework.typeORM);
     await fn(DockerPrismaPostgres, Db.postgres, Framework.prisma);
-    // await fn(DockerSequelizePostgres, Db.postgres, Framework.sequelize);
+    await fn(DockerSequelizePostgres, Db.postgres, Framework.sequelize);
 
     return;
 

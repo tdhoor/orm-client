@@ -40,7 +40,6 @@ export abstract class Test<Entity> implements IExec {
             return header + body.join("\n")
         } catch (error) {
             console.error(error);
-            console.log(this.results[0], this.results[1]);
         }
     }
 

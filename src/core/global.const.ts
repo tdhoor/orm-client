@@ -9,3 +9,5 @@ export const RESULT_DIR = "result";
 export const CSV_SEPARATOR = ";";
 
 export const FILE_SEPPARATOR = "$$";
+
+export const AMOUNT_OF_BULK_ENTRIES = 100;
