@@ -1,17 +1,16 @@
 import fs from "fs";
-import path from "path";
 import { DbSize } from "../core/db-size";
 import { AMOUNT_OF_TEST_EXECUTIONS } from "../core/global.const";
 import { calcProductCategoriesSize } from "../functions/calc-product-categories-size.function";
 import { createTestData } from "@core/functions/create-test-data.function";
-import { ROOT_DIR } from "root-dir";
+import { Test } from "src/models/test.model";
 
 function createFileName(prefix, size: DbSize) {
     return `${prefix}-${size}.json`;
 }
 
-type Test = { fileName: string, fn: () => any };
-type TestRegistry = Test[];
+type ITest = { fileName: string, fn: () => any };
+type TestRegistry = ITest[];
 
 type CreateProduct = "create/product";
 type CreateCustomerWithAddress = "create/customer-with-address";
@@ -206,78 +205,56 @@ const testDataRegistry: TestRegistry = [
 ];
 
 
-export class MockGenerator {
-    static #instance: MockGenerator | undefined;
+export class DataStorage {
+    static #instance: DataStorage | undefined;
 
-    private constructor() {
-        this.#init();
-    }
+    private constructor() { }
 
     static get instance() {
         if (!this.#instance) {
-            this.#instance = new MockGenerator();
+            this.#instance = new DataStorage();
         }
         return this.#instance;
     }
 
-    getData(name: TestName, dbSize: DbSize) {
-        return this.#readJSON(createFileName(name, dbSize));
-    }
+    add(value: Test<any> | Test<any>[]) {
+        if (Array.isArray(value)) {
+            value.forEach((v) => this.add(v));
+        } else {
+            const path = value.getDataPath();
 
-    #createJSON(name: string, txt: string) {
-        const subFolder = name.split("/")[0];
-
-        if (!fs.existsSync("data")) {
-            fs.mkdirSync("data");
-        }
-        if (!fs.existsSync("data/" + subFolder)) {
-            fs.mkdirSync("data/" + subFolder);
-        }
-        if (!fs.existsSync("data/" + name)) {
-            fs.writeFileSync("data/" + name, txt);
-        }
-    }
-
-    #readJSON(name: string) {
-        const fileName = "data/" + name;
-
-        console.log({ fileName })
-
-        if (!fs.existsSync(fileName)) {
-            return null;
-        }
-        return JSON.parse(fs.readFileSync(fileName, "utf-8"));
-    }
-
-    #init() {
-        console.log('====================================');
-        console.log("START");
-        console.log('====================================');
-        for (const test of testDataRegistry) {
-            try {
-                console.log("init", test.fileName);
-                let data = this.#readJSON(test.fileName);
-                console.log("init", !!data);
-
-                if (!!!data) {
-                    data = test.fn();
-                    this.#createJSON(test.fileName, JSON.stringify(data));
-                }
-            } catch (e) {
-                console.error(e);
+            if (!fs.existsSync(path)) {
+                console.log("Creating data for " + value.name, path);
+                const data = value.createData();
+                this.createDirs(path);
+                this.createJSON(path, data);
             }
         }
-        console.log('====================================');
-        console.log("END");
-        console.log('====================================');
     }
 
+    createJSON(path: string, data: any) {
+        fs.writeFileSync(path, JSON.stringify(data));
+    }
 
-    async #sendReq(url: string, data: any) {
-        try {
-            await fetch(url, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' } })
-        } catch (e) {
-            console.error(e);
-        }
+    get(test: Test<any>) {
+        return this.readJSON(test.getDataPath());
+    }
+
+    readJSON(path: string) {
+        return JSON.parse(fs.readFileSync(path, "utf-8"))
+    }
+
+    createDirs(path: string) {
+        const paths = path.split("/");
+        let currPath = "";
+
+        paths.forEach((path, i) => {
+            if (i !== paths.length - 1) {
+                currPath += path + "/";
+                if (!fs.existsSync(currPath)) {
+                    fs.mkdirSync(currPath);
+                }
+            }
+        });
     }
 }

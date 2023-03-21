@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
+    "test": "ts-node src/index.spec.ts",
+    "jest": "jest",
     "dev": "nodemon --watch src/**/* --exec ts-node src/index.ts"
   },
   "author": "Thomas Dorfer",

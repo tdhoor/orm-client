@@ -1,5 +1,5 @@
 export enum DbSize {
-    small = 100,
-    medium = 500,
-    large = 1000
+    small = 1000,
+    medium = 5000,
+    large = 10000
 }

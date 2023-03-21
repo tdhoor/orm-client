@@ -1,35 +1,32 @@
 import fs from "fs";
-import path from "path";
+import { Test } from "src/models/test.model";
 
 export class FileWriter {
-    static #path = "";
-
-    static setDir(name: string | any[]) {
-        let dirs = [];
-
-        if (Array.isArray(name)) {
-            dirs = name
-        } else {
-            dirs = name.split("/");
+    static write(test: Test<any>) {
+        const data = test.getResultCsvString();
+        try {
+            const path = test.getResultPath();
+            this.createDirs(path);
+            fs.writeFileSync(path, data);
+        } catch (e) {
+            console.log(test.results);
+            console.log(data);
+            console.error(e);
         }
+        console.log("wrote: " + test.name);
+    }
 
-        const curr: string[] = [];
+    static createDirs(path: string) {
+        const paths = path.split("/");
+        let currPath = "";
 
-        dirs.forEach((dir) => {
-            curr.push(dir + "");
-            this.#createDir(path.join(...curr));
+        paths.forEach((path, i) => {
+            if (i !== paths.length - 1) {
+                currPath += path + "/";
+                if (!fs.existsSync(currPath)) {
+                    fs.mkdirSync(currPath);
+                }
+            }
         });
-
-        this.#path = path.join(...curr);
-    }
-
-    static addNewLine(file: string, line: any) {
-        fs.appendFileSync(this.#path + "/" + file + ".txt", line + "\n");
-    }
-
-    static #createDir(name: string) {
-        if (!fs.existsSync(name)) {
-            fs.mkdirSync(name);
-        }
     }
 }
