@@ -22,8 +22,8 @@ export class CreateCustomerBulk extends Test<ICustomer> {
 
         const data = DataStorage.instance.get(this);
 
-        for (let i = 0; i < 10; i++) {
-            const response = await ApiHttpClient.instance.post(this.endpoint, data);
+        for (let i = 0; i < 100; i++) {
+            const response = await ApiHttpClient.instance.post<ICustomer>(this.endpoint, data);
             if (response) {
                 this.results.push(response)
             }

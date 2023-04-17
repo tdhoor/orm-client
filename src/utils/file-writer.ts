@@ -1,9 +1,18 @@
 import fs from "fs";
-import { Test } from "src/models/test.model";
+import { Test } from "../models/test.model";
 
 export class FileWriter {
     static write(test: Test<any>) {
+        try {
+            const path = test.getResponsePath();
+            this.createDirs(path);
+            fs.writeFileSync(path, JSON.stringify(test.results, null, 2));
+        } catch (e) {
+            console.log(e)
+        }
+
         const data = test.getResultCsvString();
+
         try {
             const path = test.getResultPath();
             this.createDirs(path);

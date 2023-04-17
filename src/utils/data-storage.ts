@@ -1,16 +1,16 @@
 import fs from "fs";
-import { Test } from "src/models/test.model";
+import { Test } from "../models/test.model";
 
 export class DataStorage {
-    static #instance: DataStorage | undefined;
+    private static _instance: DataStorage | undefined;
 
     private constructor() { }
 
     static get instance() {
-        if (!this.#instance) {
-            this.#instance = new DataStorage();
+        if (!DataStorage._instance) {
+            DataStorage._instance = new DataStorage();
         }
-        return this.#instance;
+        return DataStorage._instance;
     }
 
     add(value: Test<any> | Test<any>[]) {

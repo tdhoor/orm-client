@@ -1,5 +1,8 @@
+/**
+ * Amount of entities the db gets populated with
+ */
 export enum DbSize {
-    small = 1000,
-    medium = 5000,
-    large = 10000
+    small = 100000,
+    medium = 500000,
+    large = 1000000
 }

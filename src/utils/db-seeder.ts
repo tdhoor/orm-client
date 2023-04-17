@@ -1,8 +1,8 @@
-import { DbSize } from "src/core/db-size";
+import { DbSize } from "../core/db-size";
 import { ApiHttpClient } from "./api-http-client";
 
 export class DbSeeder {
-    static #instance: DbSeeder;
+    static _instance: DbSeeder;
 
     #prevDbSize: DbSize;
 
@@ -10,10 +10,10 @@ export class DbSeeder {
     }
 
     static get instance(): DbSeeder {
-        if (!DbSeeder.#instance) {
-            DbSeeder.#instance = new DbSeeder();
+        if (!DbSeeder._instance) {
+            DbSeeder._instance = new DbSeeder();
         }
-        return DbSeeder.#instance;
+        return DbSeeder._instance;
     }
 
     reset() {

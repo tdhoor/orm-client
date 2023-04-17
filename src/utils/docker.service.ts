@@ -1,4 +1,4 @@
-import { DockerStrategy } from "src/models/docker-strategy.model";
+import { DockerStrategy } from "../models/docker-strategy.model";
 
 export class DockerService {
     curr: DockerStrategy;

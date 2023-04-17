@@ -8,7 +8,7 @@ import { Framework } from "../../core/framework";
 import { Test } from "../../models/test.model";
 import { DbSize } from "../../core/db-size";
 import { Db } from "../../core/db";
-import { calcProductCategoriesSize } from "src/functions/calc-product-categories-size.function";
+import { calcProductCategoriesSize } from "../../functions/calc-product-categories-size.function";
 
 
 export class UpdateProductCategoryName extends Test<IProductCategory> {
@@ -24,7 +24,7 @@ export class UpdateProductCategoryName extends Test<IProductCategory> {
         const data: IProductCategory[] = DataStorage.instance.get(this);
 
         for (const entry of data) {
-            const response = await ApiHttpClient.instance.put(this.endpoint, entry);
+            const response = await ApiHttpClient.instance.put<IProductCategory>(this.endpoint, entry);
             if (response) {
                 this.results.push(response)
             }

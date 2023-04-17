@@ -22,7 +22,7 @@ export class ReadProduct extends Test<IProduct> {
         const data = DataStorage.instance.get(this);
 
         for (const entry of data) {
-            const response = await ApiHttpClient.instance.get(this.endpoint.replace(":id", entry + ""));
+            const response = await ApiHttpClient.instance.get<IProduct>(this.endpoint.replace(":id", entry + ""));
             if (response) {
                 this.results.push(response)
             }

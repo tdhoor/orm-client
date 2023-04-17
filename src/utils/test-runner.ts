@@ -1,5 +1,6 @@
-import { IExec } from "src/models/exec.model";
+import { IExec } from "../models/exec.model";
 import { Timeout } from "./timeout";
+import { TEST_TIMEOUT } from "../core/global.const";
 
 export class TestRunner {
     executables: IExec[] = [];
@@ -15,7 +16,7 @@ export class TestRunner {
 
     async exec() {
         for (const executable of this.executables) {
-            await new Timeout(2000).exec();
+            await new Timeout(TEST_TIMEOUT).exec();
             await executable.exec();
         }
     }

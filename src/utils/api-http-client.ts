@@ -1,71 +1,96 @@
-export class ApiHttpClient {
-    readonly #api = "http://localhost:3000/api/";
+import fetch from "node-fetch";
+import { TestResultResponse } from "@core/models/test-result-response.model";
+import { API_URL, MAX_REQUEST_TIMEOUT } from "../core/global.const";
 
-    static #instance: ApiHttpClient | undefined;
+export class ApiHttpClient {
+    readonly #api: string;
+
+    private static _instance: ApiHttpClient | undefined;
 
     private constructor() {
+        this.#api = API_URL.endsWith("/") ? API_URL : API_URL + "/";
     }
 
     static get instance(): ApiHttpClient {
-        if (!this.#instance) {
-            this.#instance = new ApiHttpClient();
+        if (!ApiHttpClient._instance) {
+            ApiHttpClient._instance = new ApiHttpClient();
         }
-        return this.#instance;
+        return ApiHttpClient._instance;
     }
 
-    async post(endpoint: string, body: any): Promise<any> {
+    async post<T>(endpoint: string, body: any): Promise<TestResultResponse<T> & { status: number }> {
         try {
             const response = await fetch(this.#api + endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                timeout: MAX_REQUEST_TIMEOUT,
                 body: JSON.stringify(body)
             });
-            return await response.json();
+            const json = await response.json() as any;
+            return {
+                ...json,
+                status: response.status
+            }
         } catch (error) {
             console.error("post error", error);
         }
     }
 
-    async get(endpoint: string): Promise<any> {
+    async get<T>(endpoint: string): Promise<TestResultResponse<T> & { status: number }> {
         try {
             const response = await fetch(this.#api + endpoint, {
                 method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/json',
+                },
+                timeout: MAX_REQUEST_TIMEOUT
             });
-            return await response.json();
+            const json = await response.json() as any;
+            return {
+                ...json,
+                status: response.status
+            }
         } catch (error) {
             console.error("get error", error);
         }
     }
 
-    async put(endpoint: string, body: any): Promise<any> {
+    async put<T>(endpoint: string, body: any): Promise<TestResultResponse<T> & { status: number }> {
         try {
             const response = await fetch(this.#api + endpoint, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
+                timeout: MAX_REQUEST_TIMEOUT,
                 body: JSON.stringify(body)
             });
-            return await response.json();
+            const json = await response.json() as any;
+            return {
+                ...json,
+                status: response.status
+            }
         } catch (error) {
             console.error("put error", error);
         }
     }
 
-    async delete(endpoint: string): Promise<any> {
+    async delete(endpoint: string): Promise<TestResultResponse<any> & { status: number }> {
         try {
             const response = await fetch(this.#api + endpoint, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                timeout: MAX_REQUEST_TIMEOUT
             });
-            return await response.json();
+            const json = await response.json() as any;
+            return {
+                ...json,
+                status: response.status
+            }
         } catch (error) {
             console.error("delete error", error);
         }

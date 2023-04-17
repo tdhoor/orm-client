@@ -23,7 +23,7 @@ export class CreateCustomerWithAddress extends Test<ICustomer> {
         const data = DataStorage.instance.get(this);
 
         for (const entry of data) {
-            const response = await ApiHttpClient.instance.post(this.endpoint, entry);
+            const response = await ApiHttpClient.instance.post<ICustomer>(this.endpoint, entry);
             if (response) {
                 this.results.push(response)
             }

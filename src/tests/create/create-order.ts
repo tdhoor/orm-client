@@ -21,7 +21,7 @@ export class CreateOrder extends Test<IOrder> {
         await super.exec();
         const data = DataStorage.instance.get(this);
         for (const entry of data) {
-            const response = await ApiHttpClient.instance.post(this.endpoint, entry);
+            const response = await ApiHttpClient.instance.post<IOrder>(this.endpoint, entry);
             if (response) {
                 this.results.push(response)
             }

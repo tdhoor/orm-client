@@ -2,8 +2,8 @@
    "compilerOptions": {
       "outDir": "./build",
       "baseUrl": ".",
-      "target": "es6",
-      "module": "commonjs",
+      "target": "ESNext",
+      "module": "CommonJS",
       "moduleResolution": "node",
       "esModuleInterop": true,
       "emitDecoratorMetadata": true,
@@ -27,6 +27,7 @@
       "node_modules"
    ],
    "ts-node": {
-      "require": ["tsconfig-paths/register"]
+      "require": ["tsconfig-paths/register"],
+      "esm": true
     }
 }

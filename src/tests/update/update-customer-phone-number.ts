@@ -22,7 +22,7 @@ export class UpdateCustomerPhoneNumber extends Test<ICustomer> {
         const data: ICustomer[] = DataStorage.instance.get(this);
 
         for (const entry of data) {
-            const response = await ApiHttpClient.instance.put(this.endpoint, entry);
+            const response = await ApiHttpClient.instance.put<ICustomer>(this.endpoint, entry);
             if (response) {
                 this.results.push(response)
             }
