@@ -10,7 +10,7 @@ import { DbSize } from "../../core/db-size";
 import { Db } from "../../core/db";
 import { calcProductCategoriesSize } from "../../functions/calc-product-categories-size.function";
 
-export class ReadProductsFromCategory extends Test<IProduct> {
+export class ReadProductsFromCategory extends Test<IProduct[]> {
     readonly endpoint = "product/category/:name";
     readonly method = "read";
 
@@ -23,14 +23,19 @@ export class ReadProductsFromCategory extends Test<IProduct> {
         const data: string[] = DataStorage.instance.get(this);
 
         for (const entry of data) {
-            const response = await ApiHttpClient.instance.get<IProduct>(this.endpoint.replace(":name", entry + ""));
+            const response = await ApiHttpClient.instance.get<IProduct[]>(this.endpoint.replace(":name", entry + ""));
             if (response) {
-                this.results.push(response)
+                this._results.push({
+                    time: response.time,
+                    data: {
+                        length: response.data.length,
+                        // @ts-ignore 
+                        ids: response.data.map(product => product.id)
+                    }
+                })
             }
         }
-        // results are very huge (>30mb) and do not need to be saved in the result file, thus we remove the data property and only save data size
-        //@ts-ignore
-        this.results = this.results.map(item => ({ ...item, data: { size: item.data.size } }))
+        this.amountOfDbEntities = await this.count();
         FileWriter.write(this);
     }
 

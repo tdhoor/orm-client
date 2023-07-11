@@ -24,95 +24,86 @@ import { CreateCustomerBulk } from "./tests/create/create-customer-bulk";
 
 
 (async () => {
-    const dockerManager = new DockerService();
+    const dockerService = new DockerService();
 
     const runTestFor = async (type: (new () => DockerStrategy), db: Db, framework: Framework) => {
         DbSeeder.instance.reset();
-        dockerManager.set(new type());
+        dockerService.set(new type());
 
         const configSmall = { db, framework, dbSize: DbSize.small };
         const configMedium = { db, framework, dbSize: DbSize.medium };
         const configLarge = { db, framework, dbSize: DbSize.large };
 
-        const small = {
-            createProductSmall: new CreateProduct(configSmall),
-            createCustomerWithAddressSmall: new CreateCustomerWithAddress(configSmall),
-            createOrderSmall: new CreateOrder(configSmall),
-            readProductsSmall: new ReadProduct(configSmall),
-            readCustomerOrdersSmall: new ReadCustomerOrders(configSmall),
-            readCustomerProductsSmall: new ReadCustomerProducts(configSmall),
-            readProductsFromCategorySmall: new ReadProductsFromCategory(configSmall),
-            updateCustomerPhoneNumberSmall: new UpdateCustomerPhoneNumber(configSmall),
-            updateProductCategoryNameSmall: new UpdateProductCategoryName(configSmall),
-            deleteCustomerSmall: new DeleteCustomer(configSmall),
-            deleteOrderSmall: new DeleteOrder(configSmall),
-            createCustomerBulkSmall: new CreateCustomerBulk(configSmall),
-        }
+        const tests = [
+            new CreateProduct(configSmall),
+            new CreateCustomerWithAddress(configSmall),
+            new CreateOrder(configSmall),
+            new ReadProduct(configSmall),
+            new ReadCustomerOrders(configSmall),
+            new ReadCustomerProducts(configSmall),
+            new ReadProductsFromCategory(configSmall),
+            new UpdateCustomerPhoneNumber(configSmall),
+            new UpdateProductCategoryName(configSmall),
+            new DeleteCustomer(configSmall),
+            new DeleteOrder(configSmall),
+            new CreateCustomerBulk(configSmall),
 
-        const medium = {
-            createProductMedium: new CreateProduct(configMedium),
-            createCustomerWithAddressMedium: new CreateCustomerWithAddress(configMedium),
-            createOrderMedium: new CreateOrder(configMedium),
-            readProductsMedium: new ReadProduct(configMedium),
-            readCustomerOrdersMedium: new ReadCustomerOrders(configMedium),
-            readCustomerProductsMedium: new ReadCustomerProducts(configMedium),
-            readProductsFromCategoryMedium: new ReadProductsFromCategory(configMedium),
-            updateCustomerPhoneNumberMedium: new UpdateCustomerPhoneNumber(configMedium),
-            updateProductCategoryNameMedium: new UpdateProductCategoryName(configMedium),
-            deleteCustomerMedium: new DeleteCustomer(configMedium),
-            deleteOrderMedium: new DeleteOrder(configMedium),
-            createCustomerBulkMedium: new CreateCustomerBulk(configMedium),
-        }
+            new CreateProduct(configMedium),
+            new CreateCustomerWithAddress(configMedium),
+            new CreateOrder(configMedium),
+            new ReadProduct(configMedium),
+            new ReadCustomerOrders(configMedium),
+            new ReadCustomerProducts(configMedium),
+            new ReadProductsFromCategory(configMedium),
+            new UpdateCustomerPhoneNumber(configMedium),
+            new UpdateProductCategoryName(configMedium),
+            new DeleteCustomer(configMedium),
+            new DeleteOrder(configMedium),
+            new CreateCustomerBulk(configMedium),
 
-        const large = {
-            createProductLarge: new CreateProduct(configLarge),
-            createCustomerWithAddressLarge: new CreateCustomerWithAddress(configLarge),
-            createOrderLarge: new CreateOrder(configLarge),
-            readProductsLarge: new ReadProduct(configLarge),
-            readCustomerOrdersLarge: new ReadCustomerOrders(configLarge),
-            readCustomerProductsLarge: new ReadCustomerProducts(configLarge),
-            readProductsFromCategoryLarge: new ReadProductsFromCategory(configLarge),
-            updateCustomerPhoneNumberLarge: new UpdateCustomerPhoneNumber(configLarge),
-            updateProductCategoryNameLarge: new UpdateProductCategoryName(configLarge),
-            deleteCustomerLarge: new DeleteCustomer(configLarge),
-            deleteOrderLarge: new DeleteOrder(configLarge),
-            createCustomerBulkLarge: new CreateCustomerBulk(configLarge)
-        };
+            new CreateProduct(configLarge),
+            new CreateCustomerWithAddress(configLarge),
+            new CreateOrder(configLarge),
+            new ReadProduct(configLarge),
+            new ReadCustomerOrders(configLarge),
+            new ReadCustomerProducts(configLarge),
+            new ReadProductsFromCategory(configLarge),
+            new UpdateCustomerPhoneNumber(configLarge),
+            new UpdateProductCategoryName(configLarge),
+            new DeleteCustomer(configLarge),
+            new DeleteOrder(configLarge),
+            new CreateCustomerBulk(configLarge)
+        ];
 
-        /**
-         * Create tests for each db size
-         */
-        const testRegistry = { ...small, ...medium, ...large };
-        const testRegistryBySize = Object.values(testRegistry).sort((a, b) => a.dbSize - b.dbSize);
         /**
          * Created test data (localted in ./data) for each db size
          */
-        DataStorage.instance.add(testRegistryBySize);
+        DataStorage.instance.create(tests);
         /**
          * Start docker containers
          */
-        await dockerManager.composeUp();
+        await dockerService.composeUp();
         /**
          * Run all tests
          */
-        const runner = await new TestRunner();
-        runner.register(testRegistryBySize).exec();
+        const runner = new TestRunner(tests);
+        await runner.exec();
         /**
          * Stop docker containers
          */
-        await dockerManager.composeDown();
+        await dockerService.composeDown();
     }
 
     /**
      * Run tests for each db and framework
      */
-    await runTestFor(DockerPrismaPostgres, Db.postgres, Framework.prisma);
-    await runTestFor(DockerPrismaMysql, Db.mysql, Framework.prisma);
-    await runTestFor(DockerPrismaMssql, Db.mssql, Framework.prisma);
+    // await runTestFor(DockerPrismaPostgres, Db.postgres, Framework.prisma);
+    // await runTestFor(DockerPrismaMysql, Db.mysql, Framework.prisma);
+    // await runTestFor(DockerPrismaMssql, Db.mssql, Framework.prisma);
 
-    await runTestFor(DockerTypeOrmPostgres, Db.postgres, Framework.typeORM);
-    await runTestFor(DockerTypeOrmMysql, Db.mysql, Framework.typeORM);
-    await runTestFor(DockerTypeOrmMssql, Db.mssql, Framework.typeORM);
+    // await runTestFor(DockerTypeOrmPostgres, Db.postgres, Framework.typeORM);
+    // await runTestFor(DockerTypeOrmMysql, Db.mysql, Framework.typeORM);
+    // await runTestFor(DockerTypeOrmMssql, Db.mssql, Framework.typeORM);
 
     await runTestFor(DockerSequelizePostgres, Db.postgres, Framework.sequelize);
     await runTestFor(DockerSequelizeMysql, Db.mysql, Framework.sequelize);

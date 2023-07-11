@@ -50,7 +50,7 @@ export class ApiHttpClient {
             const json = await response.json() as any;
             return {
                 ...json,
-                status: response.status
+                status: response?.status
             }
         } catch (error) {
             console.error("get error", error);

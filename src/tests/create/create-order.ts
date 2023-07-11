@@ -20,12 +20,14 @@ export class CreateOrder extends Test<IOrder> {
     async exec(): Promise<void> {
         await super.exec();
         const data = DataStorage.instance.get(this);
+
         for (const entry of data) {
             const response = await ApiHttpClient.instance.post<IOrder>(this.endpoint, entry);
             if (response) {
-                this.results.push(response)
+                this._results.push(response)
             }
         }
+        this.amountOfDbEntities = await this.count();
         FileWriter.write(this);
     }
 

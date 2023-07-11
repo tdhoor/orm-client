@@ -5,19 +5,15 @@ import { TEST_TIMEOUT } from "../core/global.const";
 export class TestRunner {
     executables: IExec[] = [];
 
-    register(executable: IExec | IExec[]) {
-        if (Array.isArray(executable)) {
-            executable.forEach(e => this.executables.push(e));
-        } else {
-            this.executables.push(executable);
-        }
-        return this;
+    constructor(executable: IExec[]) {
+        this.executables = executable;
     }
 
     async exec() {
-        for (const executable of this.executables) {
+        while (this.executables.length > 0) {
+            const curr = this.executables.splice(0, 1)[0];
             await new Timeout(TEST_TIMEOUT).exec();
-            await executable.exec();
+            await curr.exec();
         }
     }
 }

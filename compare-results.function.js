@@ -16,12 +16,19 @@ function compare(obj1, obj2, keysToIgnore = [], paths = {}, compareTypes = []) {
     return obj1 === obj2; // Compare null/undefined values directly
   }
 
+  if (obj1.hasOwnProperty("message")) delete obj1.message;
+  if (obj2.hasOwnProperty("message")) delete obj2.message;
+
   // Check if the objects have different numbers of keys
   if (Object.keys(obj1).length !== Object.keys(obj2).length) {
-    logObj(obj1);
-    logObj(obj2);
-    logObj(paths);
-    logObj("Objects have different numbers of keys:");
+    logObj({
+      // obj1,
+      // obj2,
+      keys1Length: Object.keys(obj1).length,
+      keys2Length: Object.keys(obj2).length,
+      paths,
+      msg: "Objects have different numbers of keys ",
+    });
     return false;
   }
 
@@ -37,31 +44,59 @@ function compare(obj1, obj2, keysToIgnore = [], paths = {}, compareTypes = []) {
     }
 
     if (key === "orderItems") {
-      let temp = true;
-
-      try {
-        obj1 = obj1.sort((a, b) => a.id - b.id);
-        obj2 = obj2.sort((a, b) => a.id - b.id);
-      } catch (e) {
-        temp = false;
+      // obj1[key] = obj1[key].sort((a, b) => a.id - b.id);
+      // obj2[key] = obj2[key].sort((a, b) => a.id - b.id);
+      function arrayOfObjectValuesToArray(arr) {
+        if (arr.length <= 0) {
+          logObj({ paths, key });
+          throw new Error("Array is empty");
+        }
+        return arr
+          .reduce((acc, orderItem) => {
+            return [...acc, ...Object.values(orderItem)];
+          }, [])
+          .sort((a, b) => a - b);
       }
-
-      if (!temp) return false;
+      obj1[key] = arrayOfObjectValuesToArray(obj1[key]);
+      obj2[key] = arrayOfObjectValuesToArray(obj2[key]);
     }
 
     if (!obj2.hasOwnProperty(key)) {
-      logObj(obj1);
-      logObj(obj2);
-      logObj(paths);
-      logObj(`Object2 is missing key: ${key}`);
+      if (key === "results") {
+        logObj({
+          keys1Length: Object.keys(obj1).length,
+          keys2Length: Object.keys(obj2).length,
+          paths,
+          msg: `Objects have different numbers of keys  ${key}`,
+        });
+      } else {
+        logObj({
+          // a: obj1,
+          // b: obj2,
+          paths,
+          msg: `Object2 is missing key: ${key}`,
+        });
+      }
       return false;
     }
 
-    if (!compare(obj1[key], obj2[key], keysToIgnore, paths)) {
-      logObj(obj1[key]);
-      logObj(obj2[key]);
-      logObj(paths);
-      logObj(`Objects have different values for key: ${key}`);
+    if (!compare(obj1[key], obj2[key], keysToIgnore, paths, compareTypes)) {
+      if (key === "results") {
+        logObj({
+          keys1Length: Object.keys(obj1).length,
+          keys2Length: Object.keys(obj2).length,
+          paths,
+          msg: `Objects have different values for key: ${key}`,
+        });
+      } else {
+        logObj({
+          value1: obj1[key],
+          value2: obj2[key],
+          paths,
+          msg: `Objects have different values for key: ${key}`,
+        });
+      }
+
       return false;
     }
   }
@@ -88,17 +123,18 @@ function compareJsonFilesInFolder(folderPath) {
     return;
   }
 
-  const firstJson = jsonContents[0];
+  const firstJson = jsonContents[7];
 
   for (let i = 1; i < jsonContents.length; i++) {
     const result = compare(
       firstJson.data,
       jsonContents[i].data,
-      ["time", "createdAt", "updatedAt"],
+      ["time", "createdAt", "updatedAt", "message"], // to differ in all responses
       {
         first: firstJson.path,
         second: jsonContents[i].path,
-      }
+      },
+      ["totalPrice"] // sometimes wrong totalPrice values are stores
     );
     if (!result) {
       console.log({

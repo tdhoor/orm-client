@@ -19,16 +19,15 @@ export class CreateCustomerBulk extends Test<ICustomer> {
 
     async exec(): Promise<void> {
         await super.exec();
-
         const data = DataStorage.instance.get(this);
 
         for (let i = 0; i < 100; i++) {
             const response = await ApiHttpClient.instance.post<ICustomer>(this.endpoint, data);
             if (response) {
-                this.results.push(response)
+                this._results.push(response)
             }
         }
-
+        this.amountOfDbEntities = await this.count();
         FileWriter.write(this);
     }
 

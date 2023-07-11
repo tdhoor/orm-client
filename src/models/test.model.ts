@@ -5,16 +5,26 @@ import { Framework } from "../core/framework";
 import { DATA_DIR, RESULT_DIR } from "../core/global.const";
 import { TestResultResponse } from "@core/models/test-result-response.model";
 import { DbSeeder } from "../utils/db-seeder";
+import { ApiHttpClient } from "src/utils/api-http-client";
 
 export abstract class Test<Entity> implements IExec {
     abstract endpoint: string;
     abstract method: "create" | "read" | "update" | "delete";
 
-    results: TestResultResponse<Entity>[] = [];
+    protected _results: TestResultResponse<Entity>[] = [];
+
+    get results() {
+        return {
+            results: this._results,
+            amountOfDbEntities: this.amountOfDbEntities
+        }
+    }
+
     name: string;
     dbSize: DbSize;
     db: Db;
     framework: Framework;
+    amountOfDbEntities: any = {};
 
     constructor(name: string, dbSize: DbSize, db: Db, framework: Framework) {
         this.dbSize = dbSize;
@@ -29,13 +39,17 @@ export abstract class Test<Entity> implements IExec {
         await DbSeeder.instance.seed(this.dbSize);
     }
 
+    async count(): Promise<any> {
+        return await ApiHttpClient.instance.get('seed/count');
+    }
+
     getResultCsvString() {
         try {
             // const header = `time${CSV_SEPARATOR}` + Object.keys(this.results[0].size).join(CSV_SEPARATOR) + "\n";
             const header = `time\n`;
             const body = [];
 
-            this.results.forEach((result, i) => {
+            this._results.forEach((result, i) => {
                 // body.push(`${result.time}` + Object.values(result.size).map(v => `${CSV_SEPARATOR}${v}`).join(""));
                 body.push(result.time + "");
             });

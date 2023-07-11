@@ -24,9 +24,10 @@ export class ReadCustomerOrders extends Test<IOrder> {
         for (const entry of data) {
             const response = await ApiHttpClient.instance.get<IOrder>(this.endpoint.replace(":id", entry + ""));
             if (response) {
-                this.results.push(response)
+                this._results.push(response)
             }
         }
+        this.amountOfDbEntities = await this.count();
         FileWriter.write(this);
     }
 

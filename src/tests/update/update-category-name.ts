@@ -26,9 +26,10 @@ export class UpdateProductCategoryName extends Test<IProductCategory> {
         for (const entry of data) {
             const response = await ApiHttpClient.instance.put<IProductCategory>(this.endpoint, entry);
             if (response) {
-                this.results.push(response)
+                this._results.push(response)
             }
         }
+        this.amountOfDbEntities = await this.count();
         FileWriter.write(this);
     }
 

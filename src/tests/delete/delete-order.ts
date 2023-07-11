@@ -24,9 +24,10 @@ export class DeleteOrder extends Test<ICustomer> {
         for (const id of data) {
             const response = await ApiHttpClient.instance.delete(`${this.endpoint}/${id}`);
             if (response) {
-                this.results.push(response)
+                this._results.push(response)
             }
         }
+        this.amountOfDbEntities = await this.count();
         FileWriter.write(this);
     }
 

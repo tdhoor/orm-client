@@ -11,7 +11,7 @@ import { Db } from "../../core/db";
 
 export class CreateProduct extends Test<IProduct> {
     readonly endpoint = "product";
-    readonly results: any[] = [];
+    readonly _results: any[] = [];
     readonly method = "create";
 
     constructor(config: { dbSize: DbSize, db: Db, framework: Framework }) {
@@ -20,15 +20,15 @@ export class CreateProduct extends Test<IProduct> {
 
     async exec(): Promise<void> {
         await super.exec();
-
         const data = DataStorage.instance.get(this);
 
         for (const entry of data) {
             const response = await ApiHttpClient.instance.post(this.endpoint, entry);
             if (response) {
-                this.results.push(response)
+                this._results.push(response)
             }
         }
+        this.amountOfDbEntities = await this.count();
         FileWriter.write(this);
     }
 

@@ -24,9 +24,10 @@ export class UpdateCustomerPhoneNumber extends Test<ICustomer> {
         for (const entry of data) {
             const response = await ApiHttpClient.instance.put<ICustomer>(this.endpoint, entry);
             if (response) {
-                this.results.push(response)
+                this._results.push(response)
             }
         }
+        this.amountOfDbEntities = await this.count();
         FileWriter.write(this);
     }
 
