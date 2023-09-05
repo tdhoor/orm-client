@@ -1,20 +1,21 @@
 import fs from "fs";
 import { Test } from "../models/test.model";
 
-export class FileWriter {
-    static write(test: Test<any>) {
+export class TesteResultConverter {
+    static convertAndStoreResults(test: Test<any>) {
+        // store response data (test results) as object
         try {
-            const path = test.getResponsePath();
+            const path = test.getPathToResponseData();
             this.createDirs(path);
             fs.writeFileSync(path, JSON.stringify(test.results, null, 2));
         } catch (e) {
             console.log(e)
         }
 
+        // store response data (test results) as csv 
         const data = test.getResultCsvString();
-
         try {
-            const path = test.getResultPath();
+            const path = test.getPathToResultPath();
             this.createDirs(path);
             fs.writeFileSync(path, data);
         } catch (e) {
@@ -25,7 +26,7 @@ export class FileWriter {
         console.log("wrote: " + test.name);
     }
 
-    static createDirs(path: string) {
+    private static createDirs(path: string) {
         const paths = path.split("/");
         let currPath = "";
 

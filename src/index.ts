@@ -2,7 +2,6 @@ import { Db } from "./core/db";
 import { DbSize } from "./core/db-size";
 import { Framework } from "./core/framework";
 import { TestRunner } from "./utils/test-runner";
-import { DataStorage } from "./utils/data-storage";
 import { CreateCustomerWithAddress } from "./tests/create/create-customer-with-address";
 import { CreateOrder } from "./tests/create/create-order";
 import { CreateProduct } from "./tests/create/create-product";
@@ -12,7 +11,7 @@ import { UpdateCustomerPhoneNumber } from "./tests/update/update-customer-phone-
 import { UpdateProductCategoryName } from "./tests/update/update-category-name";
 import { DeleteCustomer } from "./tests/delete/delete-customer";
 import { DeleteOrder } from "./tests/delete/delete-order";
-import { DbSeeder } from "./utils/db-seeder";
+import { DbSeederService } from "./utils/db-seeder.service";
 import { ReadProductsFromCategory } from "./tests/read/read-products-from-category";
 import { DockerService } from "./utils/docker.service";
 import { DockerStrategy } from "./models/docker-strategy.model";
@@ -21,14 +20,15 @@ import { DockerPrismaMssql, DockerPrismaMysql, DockerPrismaPostgres } from "./mo
 import { DockerSequelizeMssql, DockerSequelizeMysql, DockerSequelizePostgres } from "./models/docker-sequelize-postgres.model";
 import { ReadProduct } from "./tests/read/read-product";
 import { CreateCustomerBulk } from "./tests/create/create-customer-bulk";
+import { MockDataService } from "./utils/mock-data.service";
 
 
 (async () => {
     const dockerService = new DockerService();
 
     const runTestFor = async (type: (new () => DockerStrategy), db: Db, framework: Framework) => {
-        DbSeeder.instance.reset();
-        dockerService.set(new type());
+        DbSeederService.instance.resetDbSeederService();
+        dockerService.setStrategy(new type());
 
         const configSmall = { db, framework, dbSize: DbSize.small };
         const configMedium = { db, framework, dbSize: DbSize.medium };
@@ -78,7 +78,7 @@ import { CreateCustomerBulk } from "./tests/create/create-customer-bulk";
         /**
          * Created test data (localted in ./data) for each db size
          */
-        DataStorage.instance.create(tests);
+        MockDataService.instance.createAndSaveMockData(tests);
         /**
          * Start docker containers
          */
@@ -97,13 +97,13 @@ import { CreateCustomerBulk } from "./tests/create/create-customer-bulk";
     /**
      * Run tests for each db and framework
      */
-    // await runTestFor(DockerPrismaPostgres, Db.postgres, Framework.prisma);
-    // await runTestFor(DockerPrismaMysql, Db.mysql, Framework.prisma);
-    // await runTestFor(DockerPrismaMssql, Db.mssql, Framework.prisma);
+    await runTestFor(DockerPrismaPostgres, Db.postgres, Framework.prisma);
+    await runTestFor(DockerPrismaMysql, Db.mysql, Framework.prisma);
+    await runTestFor(DockerPrismaMssql, Db.mssql, Framework.prisma);
 
-    // await runTestFor(DockerTypeOrmPostgres, Db.postgres, Framework.typeORM);
-    // await runTestFor(DockerTypeOrmMysql, Db.mysql, Framework.typeORM);
-    // await runTestFor(DockerTypeOrmMssql, Db.mssql, Framework.typeORM);
+    await runTestFor(DockerTypeOrmPostgres, Db.postgres, Framework.typeORM);
+    await runTestFor(DockerTypeOrmMysql, Db.mysql, Framework.typeORM);
+    await runTestFor(DockerTypeOrmMssql, Db.mssql, Framework.typeORM);
 
     await runTestFor(DockerSequelizePostgres, Db.postgres, Framework.sequelize);
     await runTestFor(DockerSequelizeMysql, Db.mysql, Framework.sequelize);

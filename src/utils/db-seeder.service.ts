@@ -1,26 +1,26 @@
 import { DbSize } from "../core/db-size";
 import { ApiHttpClient } from "./api-http-client";
 
-export class DbSeeder {
-    static _instance: DbSeeder;
+export class DbSeederService {
+    static _instance: DbSeederService;
 
     #prevDbSize: DbSize;
 
     private constructor() {
     }
 
-    static get instance(): DbSeeder {
-        if (!DbSeeder._instance) {
-            DbSeeder._instance = new DbSeeder();
+    static get instance(): DbSeederService {
+        if (!DbSeederService._instance) {
+            DbSeederService._instance = new DbSeederService();
         }
-        return DbSeeder._instance;
+        return DbSeederService._instance;
     }
 
-    reset() {
+    resetDbSeederService() {
         this.#prevDbSize = undefined;
     }
 
-    async seed(size: DbSize): Promise<void> {
+    async seedDatabase(size: DbSize): Promise<void> {
         if (this.#prevDbSize !== size) {
             let p1 = performance.now();
             console.log("seed db with " + size + " records");

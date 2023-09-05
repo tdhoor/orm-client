@@ -2,8 +2,8 @@ import { createTestData } from "@core/functions/create-test-data.function";
 import { ICustomer } from "@core/models/entities/customer.model";
 import { AMOUNT_OF_TEST_EXECUTIONS } from "../../core/global.const";
 import { ApiHttpClient } from "../../utils/api-http-client";
-import { DataStorage } from "../../utils/data-storage";
-import { FileWriter } from "../../utils/file-writer";
+import { MockDataService } from "../../utils/mock-data.service";
+import { TesteResultConverter } from "../../utils/test-result-converter";
 import { Framework } from "../../core/framework";
 import { Test } from "../../models/test.model";
 import { DbSize } from "../../core/db-size";
@@ -19,7 +19,7 @@ export class UpdateCustomerPhoneNumber extends Test<ICustomer> {
 
     async exec(): Promise<void> {
         await super.exec();
-        const data: ICustomer[] = DataStorage.instance.get(this);
+        const data: ICustomer[] = MockDataService.instance.getMockData(this);
 
         for (const entry of data) {
             const response = await ApiHttpClient.instance.put<ICustomer>(this.endpoint, entry);
@@ -27,11 +27,11 @@ export class UpdateCustomerPhoneNumber extends Test<ICustomer> {
                 this._results.push(response)
             }
         }
-        this.amountOfDbEntities = await this.count();
-        FileWriter.write(this);
+        this.amountOfDbEntities = await this.countTuplesPerTable();
+        TesteResultConverter.convertAndStoreResults(this);
     }
 
-    createData(): any {
+    createMockData(): any {
         return createTestData.update.customers(AMOUNT_OF_TEST_EXECUTIONS, this.dbSize);
     }
 }

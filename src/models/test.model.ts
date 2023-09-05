@@ -4,7 +4,7 @@ import { Db } from "../core/db";
 import { Framework } from "../core/framework";
 import { DATA_DIR, RESULT_DIR } from "../core/global.const";
 import { TestResultResponse } from "@core/models/test-result-response.model";
-import { DbSeeder } from "../utils/db-seeder";
+import { DbSeederService } from "../utils/db-seeder.service";
 import { ApiHttpClient } from "src/utils/api-http-client";
 
 export abstract class Test<Entity> implements IExec {
@@ -33,13 +33,13 @@ export abstract class Test<Entity> implements IExec {
         this.framework = framework;
     }
 
-    abstract createData(): any;
+    abstract createMockData(): any;
 
     async exec(): Promise<void> {
-        await DbSeeder.instance.seed(this.dbSize);
+        await DbSeederService.instance.seedDatabase(this.dbSize);
     }
 
-    async count(): Promise<any> {
+    async countTuplesPerTable(): Promise<any> {
         return await ApiHttpClient.instance.get('seed/count');
     }
 
@@ -59,17 +59,17 @@ export abstract class Test<Entity> implements IExec {
         }
     }
 
-    getResultPath(): string {
+    getPathToResultPath(): string {
         const timestamp = new Date().toISOString().substring(0, 19).replace(/:/g, "-");
         // return `${RESULT_DIR}/${this.method}/${this.name}/${this.framework}.${this.db}.${timestamp}.csv`
         return `${RESULT_DIR}/${this.method}/${this.name}/${this.framework}.${this.db}.csv`
     }
 
-    getResponsePath(): string {
+    getPathToResponseData(): string {
         return `response/${this.method}/${this.name}/${this.framework}.${this.db}.json`
     }
 
-    getDataPath(): string {
+    getPathToMockData(): string {
         return `${DATA_DIR}/${this.method}/${this.name}.json`
     }
 }

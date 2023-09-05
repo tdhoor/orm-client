@@ -2,8 +2,8 @@ import { createTestData } from "@core/functions/create-test-data.function";
 import { IOrder } from "@core/models/entities/order.model";
 import { AMOUNT_OF_TEST_EXECUTIONS } from "../../core/global.const";
 import { ApiHttpClient } from "../../utils/api-http-client";
-import { DataStorage } from "../../utils/data-storage";
-import { FileWriter } from "../../utils/file-writer";
+import { MockDataService } from "../../utils/mock-data.service";
+import { TesteResultConverter } from "../../utils/test-result-converter";
 import { Framework } from "../../core/framework";
 import { Test } from "../../models/test.model";
 import { DbSize } from "../../core/db-size";
@@ -19,7 +19,7 @@ export class CreateOrder extends Test<IOrder> {
 
     async exec(): Promise<void> {
         await super.exec();
-        const data = DataStorage.instance.get(this);
+        const data = MockDataService.instance.getMockData(this);
 
         for (const entry of data) {
             const response = await ApiHttpClient.instance.post<IOrder>(this.endpoint, entry);
@@ -27,11 +27,11 @@ export class CreateOrder extends Test<IOrder> {
                 this._results.push(response)
             }
         }
-        this.amountOfDbEntities = await this.count();
-        FileWriter.write(this);
+        this.amountOfDbEntities = await this.countTuplesPerTable();
+        TesteResultConverter.convertAndStoreResults(this);
     }
 
-    createData(): any {
+    createMockData(): any {
         const { orders } = createTestData.create.orders(AMOUNT_OF_TEST_EXECUTIONS, this.dbSize, this.dbSize);
         return orders;
     }
